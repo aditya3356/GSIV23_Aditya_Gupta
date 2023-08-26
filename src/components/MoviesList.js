@@ -4,35 +4,53 @@ import MovieCard from "./MovieCard";
 import { REQUEST_HEADERS } from "../constants";
 import { getMoviesRequestData } from "../utils";
 
+let abortController;
 const MoviesList = ({ searchQuery }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [movies, setMovies] = useState([]);
   const observerTarget = useRef(null);
 
+  useEffect(() => {
+    if (abortController) {
+      abortController.abort();
+    }
+    setPageNumber(1);
+    setTotalPages(1);
+    setMovies([]);
+  }, [searchQuery]);
+
   const getMovies = useCallback(async () => {
     if (pageNumber <= totalPages) {
-      const { url, queryParams } = getMoviesRequestData(searchQuery);
-      const res = await axios.get(url, {
-        params: {
-          ...queryParams,
-          page: pageNumber,
-        },
-        headers: REQUEST_HEADERS,
-      });
-      setTotalPages(res.data.total_pages);
-      setMovies((prevMovies) => [
-        ...prevMovies,
-        ...res.data.results.filter(
-          (movie) =>
-            movie.poster_path &&
-            movie.title &&
-            movie.popularity &&
-            movie.overview &&
-            movie.overview !== ""
-        ),
-      ]);
-      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+      try {
+        const { url, queryParams } = getMoviesRequestData(searchQuery);
+        abortController = new AbortController();
+        const res = await axios.get(url, {
+          params: {
+            ...queryParams,
+            page: pageNumber,
+          },
+          signal: abortController.signal,
+          headers: REQUEST_HEADERS,
+        });
+        setTotalPages(res.data.total_pages);
+        setMovies((prevMovies) => [
+          ...prevMovies,
+          ...res.data.results.filter(
+            (movie) =>
+              movie.poster_path &&
+              movie.title &&
+              movie.popularity &&
+              movie.overview &&
+              movie.overview !== ""
+          ),
+        ]);
+        setPageNumber((prevPageNumber) => prevPageNumber + 1);
+      } catch (e) {
+        setPageNumber(1);
+        setTotalPages(1);
+        setMovies([]);
+      }
     }
   }, [pageNumber, totalPages, searchQuery]);
 
