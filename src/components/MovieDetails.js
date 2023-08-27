@@ -5,6 +5,7 @@ import {
   REQUEST_HEADERS,
 } from "../constants";
 import axios from "axios";
+import { toHoursAndMinutes } from "../utils";
 
 const MovieDetails = ({ id }) => {
   const [movieInfo, setMovieInfo] = useState({});
@@ -47,7 +48,8 @@ const MovieDetails = ({ id }) => {
           </div>
         </div>
         <div className="mb-1 text-xl text-[#4a4a4a]">
-          {movieInfo.release_date?.substring(0, 4)} | {movieInfo.runtime} |{" "}
+          {movieInfo.release_date?.substring(0, 4)} |{" "}
+          {toHoursAndMinutes(movieInfo.runtime)} |{" "}
           {
             castAndCrewInfo.crew?.find((person) => person.job === "Director")
               ?.name

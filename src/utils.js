@@ -28,3 +28,16 @@ export const getMoviesRequestData = (searchQuery) => {
     queryParams: GET_UPCOMING_MOVIES_QUERY_PARAMS,
   };
 };
+
+export const toHoursAndMinutes = (totalMinutes) => {
+  if (!totalMinutes) {
+    return;
+  }
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${padToTwoDigits(hours)}:${padToTwoDigits(minutes)}`;
+};
+
+const padToTwoDigits = (num) => {
+  return num.toString().padStart(2, "0");
+};
