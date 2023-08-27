@@ -16,14 +16,14 @@ const MovieDetails = ({ id }) => {
       headers: REQUEST_HEADERS,
     });
     setMovieInfo(res.data);
-  });
+  }, [id]);
 
   const getCastAndCrewInfo = useCallback(async () => {
     const res = await axios.get(`${GET_MOVIE_DETAILS_ENDPOINT}/${id}/credits`, {
       headers: REQUEST_HEADERS,
     });
     setCastAndCrewInfo({ cast: res.data.cast, crew: res.data.crew });
-  });
+  }, [id]);
 
   useEffect(() => {
     getMovieInfo();
