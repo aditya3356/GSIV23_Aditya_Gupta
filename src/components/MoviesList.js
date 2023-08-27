@@ -1,15 +1,23 @@
-import { useCallback, useEffect, useState, useRef } from "react";
-import axios from "axios";
+import { useCallback, useEffect, useRef, useContext } from "react";
+import axios, { CanceledError } from "axios";
 import MovieCard from "./MovieCard";
 import { REQUEST_HEADERS } from "../constants";
 import { getMoviesRequestData } from "../utils";
+import { observer } from "mobx-react-lite";
+import StoreContext from "../store/Store";
 
 let abortController;
-const MoviesList = ({ searchQuery }) => {
-  const [pageNumber, setPageNumber] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [movies, setMovies] = useState([]);
+const MoviesList = () => {
   const observerTarget = useRef(null);
+  const {
+    searchQuery,
+    pageNumber,
+    setPageNumber,
+    totalPages,
+    setTotalPages,
+    movies,
+    setMovies,
+  } = useContext(StoreContext);
 
   useEffect(() => {
     if (abortController) {
@@ -18,7 +26,7 @@ const MoviesList = ({ searchQuery }) => {
     setPageNumber(1);
     setTotalPages(1);
     setMovies([]);
-  }, [searchQuery]);
+  }, [searchQuery, setPageNumber, setTotalPages, setMovies]);
 
   const getMovies = useCallback(async () => {
     if (pageNumber <= totalPages) {
@@ -34,8 +42,8 @@ const MoviesList = ({ searchQuery }) => {
           headers: REQUEST_HEADERS,
         });
         setTotalPages(res.data.total_pages);
-        setMovies((prevMovies) => [
-          ...prevMovies,
+        setMovies([
+          ...movies,
           ...res.data.results.filter(
             (movie) =>
               movie.poster_path &&
@@ -45,14 +53,25 @@ const MoviesList = ({ searchQuery }) => {
               movie.overview.trim() !== ""
           ),
         ]);
-        setPageNumber((prevPageNumber) => prevPageNumber + 1);
+        setPageNumber(pageNumber + 1);
       } catch (e) {
+        if (e.name !== "CanceledError") {
+          console.error("An error occurred while fetching movies!", e);
+        }
         setPageNumber(1);
         setTotalPages(1);
         setMovies([]);
       }
     }
-  }, [pageNumber, totalPages, searchQuery]);
+  }, [
+    pageNumber,
+    totalPages,
+    searchQuery,
+    setPageNumber,
+    setTotalPages,
+    setMovies,
+    movies,
+  ]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -79,6 +98,7 @@ const MoviesList = ({ searchQuery }) => {
     <div className="p-3 grid grid-cols-5 gap-x-2 gap-y-2">
       {movies.map((movie) => (
         <MovieCard
+          key={movie.id}
           posterUrl={movie.poster_path}
           title={movie.title}
           rating={movie.vote_average ? movie.vote_average : movie.popularity}
@@ -91,4 +111,4 @@ const MoviesList = ({ searchQuery }) => {
   );
 };
 
-export default MoviesList;
+export default observer(MoviesList);

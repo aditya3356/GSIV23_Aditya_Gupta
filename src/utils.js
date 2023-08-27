@@ -30,7 +30,7 @@ export const getMoviesRequestData = (searchQuery) => {
 };
 
 export const toHoursAndMinutes = (totalMinutes) => {
-  if (!totalMinutes) {
+  if (totalMinutes == null) {
     return;
   }
   const hours = Math.floor(totalMinutes / 60);
