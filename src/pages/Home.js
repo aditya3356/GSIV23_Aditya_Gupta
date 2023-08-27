@@ -6,7 +6,7 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div>
+    <div className="font-roboto">
       <Navbar setSearchQuery={setSearchQuery} />
       <MoviesList searchQuery={searchQuery} />
     </div>

@@ -40,9 +40,9 @@ const MoviesList = ({ searchQuery }) => {
             (movie) =>
               movie.poster_path &&
               movie.title &&
-              movie.popularity &&
+              (movie.vote_average || movie.popularity) &&
               movie.overview &&
-              movie.overview !== ""
+              movie.overview.trim() !== ""
           ),
         ]);
         setPageNumber((prevPageNumber) => prevPageNumber + 1);
@@ -76,13 +76,14 @@ const MoviesList = ({ searchQuery }) => {
   }, [observerTarget, getMovies]);
 
   return (
-    <div className="p-3 grid grid-cols-5 auto-rows-auto gap-x-2 gap-y-2">
+    <div className="p-3 grid grid-cols-5 gap-x-2 gap-y-2">
       {movies.map((movie) => (
         <MovieCard
           posterUrl={movie.poster_path}
           title={movie.title}
-          rating={movie.popularity}
+          rating={movie.vote_average ? movie.vote_average : movie.popularity}
           description={movie.overview}
+          id={movie.id}
         />
       ))}
       <div ref={observerTarget}></div>

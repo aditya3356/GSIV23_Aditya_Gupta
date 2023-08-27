@@ -1,5 +1,10 @@
 import { getTomorrowDate } from "./utils";
 
+export const GET_MOVIE_DETAILS_ENDPOINT = "https://api.themoviedb.org/3/movie";
+
+export const GET_MOVIE_POSTER_IMAGE_ENDPOINT =
+  "https://image.tmdb.org/t/p/original";
+
 export const GET_MOVIES_MATCHING_SEARCH_QUERY_ENDPOINT =
   "https://api.themoviedb.org/3/search/movie";
 
